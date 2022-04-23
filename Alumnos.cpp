@@ -422,4 +422,519 @@ void BuscarAlumno(){
 		cout << "No es posible iniciar la biblioteca de MySQL" << endl;
 	}
 }
-
+////////////////////BUSCAR GRADO///////////////////////////////
+void BuscarGrado(){
+	MYSQL* connection;
+	long grado_id;
+	string grado_nombre;
+	string sql;
+	int result;
+	const char* query;
+	connection = mysql_init(0);
+	if (connection)
+	{
+		cout<< "La libreria MySQL se ha iniciado correctamente"<<endl;
+		connection = mysql_real_connect(connection,serverdb, userdb, passworddb,databasedb, 3306, NULL,0);
+		if(connection)
+	{
+		cout<<"Conexion exitosa a la base de datos "<<endl;
+	    fflush(stdin);
+	    cout<<endl;
+		cout << "Ingrese el nombre del grado a buscar: ";
+		cin>>grado_nombre; 
+		//pendiente de obtener
+			MYSQL_ROW row;
+			MYSQL_RES* data;
+			sql = "SELECT * FROM grado where grado_nombre='" + grado_nombre + "'";
+			query = sql.c_str();
+			result = mysql_query(connection, query);
+			if (result == 0) 
+			{
+				cout << "Se han obtenido los datos del grado" << endl;
+				cout<<endl;	
+				data = mysql_store_result(connection);
+				int countColumns = mysql_num_fields(data);
+				while(row = mysql_fetch_row(data))
+				{
+					for (int i = 2; i < countColumns; i++)
+					{
+						cout << "Id: " << row[0] << endl;
+     					cout << "Nombre: " << row[1] << endl;      
+      					cout << "Codigo: " << row[2] << endl;      
+					}
+					cout << endl;
+				}
+			}
+		else
+		{
+		cout<< "No se han obtenido los datos del grado, aun no existe" << mysql_error(connection) << endl;		
+		}
+		}
+		else 
+		{
+			cout << "No fue posible conectarse a la base de datos: " << mysql_error(connection) << endl;
+		}
+	}
+	else 
+	{
+		cout << "No es posible iniciar la biblioteca de MySQL" << endl;
+	}
+}
+/////////////////////////BORRAR ALUMNO O GRADO//////////////////////////
+void BorrarAlumnooGrado(){
+	int opcion;
+	char opc = 's';
+	while (opc == 's')
+	{
+    system("cls");
+	int opcion;
+	cout<<"Ingrese una de las siguientes ocpiones"<<endl;
+	cout<<"1-Borrar Alumno"<<endl; 
+	cout<<"2-Borrar Grado"<<endl;
+	cout<<"3-Regresar al menu"<<endl;
+	cin>>opcion;
+switch (opcion)
+	{
+	
+		case 1: 
+         		BorrarAlumno();
+        break;
+        case 2: 
+         		BorrarGrado();
+        break;
+        case 3: 
+         		cout<<"Desea regresar al menu de borrar S/N ?\n"<<endl;
+                fflush(stdin);
+				cin>>opc;
+		break;
+		}
+	}
+}
+/////////////////////////////BORRAR ALUMNO/////////////////////////////
+void BorrarAlumno(){
+	MYSQL* connection;
+	string alumno_id;
+	string alumno_nombre;
+	string asignado_id;
+	int result;
+	string sql;
+	string sql2;
+	string sql3;
+	string sql4;
+	string sql5;
+	string delete1;
+	string delete2;
+	string delete3;
+	const char* query;
+	MYSQL_ROW row;
+	MYSQL_RES* res;
+	MYSQL_RES* data;
+	connection = mysql_init(0);
+	if (connection)
+	{
+		cout<< "La libreria MySQL se ha iniciado correctamente"<<endl;
+		connection = mysql_real_connect(connection,serverdb, userdb, passworddb,databasedb, 3306, NULL,0);
+		if(connection)
+	{
+			
+			sql3 = "SELECT * FROM alumno ";
+			query = sql3.c_str();
+			result = mysql_query(connection, query);
+			if (result == 0) 
+			{
+				cout << "Se han obtenido los datos del grado" << endl;
+				cout<<endl;	
+				cout<<"Registros de Alumnos Ingresados para Borrar:"<<endl;
+				cout<<"Id"<<"\t"<<"Nombres "<<"\t"<<"Clave"<<"\t"<<"Correo"<<"\t\t"<<"Promedio nota"<<endl;
+				cout<<endl;
+				data = mysql_store_result(connection);
+				int countColumns = mysql_num_fields(data);
+				while(row = mysql_fetch_row(data))
+				{
+					for (int i = 0; i < countColumns; i++)
+					{
+						cout << row[i] << "\t";
+     				    
+					}
+					cout << endl;
+				}
+			}
+			cout<<endl;	
+			sql5 = "SELECT * FROM asignado ";
+			query = sql5.c_str();
+			result = mysql_query(connection, query);
+			if (result == 0) 
+			{
+				cout << "Se han obtenido los datos de Asignados" << endl;
+				cout<<endl;	
+				cout<<"Registros de Asignados Ingresados para Borrar:"<<endl;
+				cout<<"Id"<<"\t"<<"Id Nombre "<<"\t"<<"Id Grado"<<"\t"<<"Id nota"<<"\t\t"<<"Id Seccion"<<endl;
+				cout<<endl;
+				data = mysql_store_result(connection);
+				int countColumns = mysql_num_fields(data);
+				while(row = mysql_fetch_row(data))
+				{
+					for (int i = 0; i < countColumns; i++)
+					{
+						cout << row[i] << "\t\t";
+     				    
+					}
+					cout << endl;
+				}
+			}
+			cout<<endl;	
+	cout<<"Conexion exitosa a la base de datos "<<endl;
+	cout<<endl;
+	cout<<"Ingrese el nombre del Alumno a Borrar:";
+	cin>>alumno_nombre;
+	cout<<"Ingrese el id asignado del Alumno a Borrar:";
+	cin>>asignado_id;
+	cout<<"Ingrese nuevamente el id del Alumno a Borrar:";
+	cin>>alumno_id;
+	sql = "SELECT * FROM asignado WHERE asignado_id = '"+ asignado_id +"' ";
+	string query = sql.c_str();
+	const char* q = query.c_str();
+	mysql_query(connection, q);
+	res = mysql_store_result(connection);
+	int count = mysql_num_fields(res);
+	my_ulonglong x = mysql_num_rows(res);
+	
+	sql2 = "SELECT * FROM alumno WHERE alumno_nombre = '"+ alumno_nombre +"' ";
+	string query1 = sql2.c_str();
+	const char* q1 = query1.c_str();
+	mysql_query(connection, q1);
+	res = mysql_store_result(connection);
+	int count1 = mysql_num_fields(res);
+	my_ulonglong i = mysql_num_rows(res);
+	
+	sql4 = "SELECT * FROM alumno WHERE alumno_id = '"+ alumno_id +"' ";
+	string query2 = sql4.c_str();
+	const char* q2 = query2.c_str();
+	mysql_query(connection, q2);
+	res = mysql_store_result(connection);
+	int count2 = mysql_num_fields(res);
+	my_ulonglong x1 = mysql_num_rows(res);
+		
+	if(x1>0)
+	{
+		delete2 = "DELETE FROM asignado WHERE asignado_id = '"+ asignado_id +"' ";
+		string query = delete2.c_str();
+		const char* q = query.c_str();	
+		mysql_query(connection, q);
+		cout<< x <<" "<<asignado_id<<" "<<""<<endl;
+		cout<<endl;		
+	}
+	else
+	{
+		cout<<"No se encontro el alumno el la tabla asignado"<<endl;
+	}
+	if(x>0)
+	{
+		delete3 = "DELETE FROM alumno WHERE alumno_id = '"+ alumno_id +"' ";
+		string query2 = delete3.c_str();
+		const char* q2 = query2.c_str();	
+		mysql_query(connection, q2);
+		cout<< x <<" "<<alumno_id<<" "<<""<<endl;
+		cout<<endl;		
+	}
+	else
+	{
+		cout<<"No se encontro el alumno"<<endl;
+	}
+	if(i>0)
+	{
+		delete1 = "DELETE FROM alumno WHERE alumno_nombre = '"+ alumno_nombre +"' ";
+		string query1 = delete1.c_str();
+		const char* q1 = query1.c_str();	
+		mysql_query(connection, q1);
+		cout<< i <<" "<<alumno_nombre<<" "<<"Alumno encontrado y Borrado"<<endl;
+		cout<<endl;			
+	}
+	else
+	{
+		cout<<"No se encontro el alumno"<<endl;
+	}
+	}
+		else 
+		{
+			cout << "No fue posible conectarse a la base de datos: " << mysql_error(connection) << endl;
+		}
+	}
+	else 
+	{
+		cout << "No es posible iniciar la biblioteca de MySQL" << endl;
+	}
+system("Pause()");		
+}
+//////////////BORRAR GRADO//////////////////////////////
+void BorrarGrado(){
+	MYSQL* connection;
+	string grado_id;
+	string grado_nombre;
+	string asignado_id;
+	int result;
+	string sql;
+	string sql2;
+	string sql3;
+	string sql4;
+	string sql5;
+	string delete1;
+	string delete2;
+	string delete3;
+	const char* query;
+	MYSQL_ROW row;
+	MYSQL_RES* res;
+	MYSQL_RES* data;
+	connection = mysql_init(0);
+	if (connection)
+	{
+		cout<< "La libreria MySQL se ha iniciado correctamente"<<endl;
+		connection = mysql_real_connect(connection,serverdb, userdb, passworddb,databasedb, 3306, NULL,0);
+		if(connection)
+	{
+		sql3 = "SELECT * FROM grado ";
+			query = sql3.c_str();
+			result = mysql_query(connection, query);
+			if (result == 0) 
+			{
+				cout << "Se han obtenido los datos del grado" << endl;
+				cout<<endl;	
+				cout<<"Registros de Grados Ingresados para Borrar:"<<endl;
+				cout<<endl;
+				cout<<"Id"<<"\t"<<"Nombres"<<" "<<"Codigo"<<endl;
+				data = mysql_store_result(connection);
+				int countColumns = mysql_num_fields(data);
+				while(row = mysql_fetch_row(data))
+				{
+					for (int i = 0; i < countColumns; i++)
+					{
+						cout << row[i] << "\t";
+     				    
+					}
+					cout << endl;
+				}
+			}
+			cout<<endl;
+			sql5 = "SELECT * FROM asignado ";
+			query = sql5.c_str();
+			result = mysql_query(connection, query);
+			if (result == 0) 
+			{
+				cout << "Se han obtenido los datos de Asignados" << endl;
+				cout<<endl;	
+				cout<<"Registros de Asignados Ingresados para Borrar:"<<endl;
+				cout<<"Id"<<"\t"<<"Id Nombre "<<"\t"<<"Id Grado"<<"\t"<<"Id nota"<<"\t\t"<<"Id Seccion"<<endl;
+				cout<<endl;
+				data = mysql_store_result(connection);
+				int countColumns = mysql_num_fields(data);
+				while(row = mysql_fetch_row(data))
+				{
+					for (int i = 0; i < countColumns; i++)
+					{
+						cout << row[i] << "\t\t";
+     				    
+					}
+					cout << endl;
+				}
+			}
+			cout<<endl;		
+	cout<<"Conexion exitosa a la base de datos "<<endl;
+	cout<<endl;
+	cout<<"Ingrese el nombre del Grado a Borrar:";
+	cin>>grado_nombre;
+	cout<<"Ingrese el id de Asignado a Borrar:";
+	cin>>asignado_id;
+	cout<<"Ingrese el id del Grado a Borrar:";
+	cin>>grado_id;
+	sql = "SELECT * FROM asignado WHERE asignado_id = '"+ asignado_id +"' ";
+	string query = sql.c_str();
+	const char* q = query.c_str();
+	mysql_query(connection, q);
+	res = mysql_store_result(connection);
+	int count = mysql_num_fields(res);
+	my_ulonglong x = mysql_num_rows(res);
+	
+	sql2 = "SELECT * FROM grado WHERE grado_nombre = '"+ grado_nombre +"' ";
+	string query1 = sql2.c_str();
+	const char* q1 = query1.c_str();
+	mysql_query(connection, q1);
+	res = mysql_store_result(connection);
+	int count1 = mysql_num_fields(res);
+	my_ulonglong i = mysql_num_rows(res);
+	
+	sql4 = "SELECT * FROM grado WHERE grado_id = '"+ grado_id +"' ";
+	string query2 = sql4.c_str();
+	const char* q2 = query2.c_str();
+	mysql_query(connection, q2);
+	res = mysql_store_result(connection);
+	int count2 = mysql_num_fields(res);
+	my_ulonglong j = mysql_num_rows(res);
+		
+	if(x>0)
+	{
+		delete2 = "DELETE FROM asignado WHERE asignado_id = '"+ asignado_id +"' ";
+		string query = delete2.c_str();
+		const char* q = query.c_str();	
+		mysql_query(connection, q);
+		cout<< x <<" "<<asignado_id<<" "<<""<<endl;
+		cout<<endl;		
+	}
+	else
+	{
+		cout<<"No se encontro el Grado en la tabla asignado"<<endl;
+	}
+	if(i>0)
+	{
+		delete1 = "DELETE FROM grado WHERE grado_nombre = '"+ grado_nombre +"' ";
+		string query1 = delete1.c_str();
+		const char* q1 = query1.c_str();	
+		mysql_query(connection, q1);
+		cout<< i <<" "<<grado_nombre<<" "<<"Grado encontrado y Borrado"<<endl;
+		cout<<endl;			
+	}
+	else
+	{
+		cout<<"No se encontro el Grado"<<endl;
+	}
+	if(j>0)
+	{
+		delete3 = "DELETE FROM grado WHERE grado_nombre = '"+ grado_nombre +"' ";
+		string query2 = delete3.c_str();
+		const char* q2 = query2.c_str();	
+		mysql_query(connection, q2);
+		cout<< j <<" "<<grado_nombre<<" "<<"Grado encontrado y Borrado"<<endl;
+		cout<<endl;			
+	}
+	else
+	{
+		cout<<"No se encontro el Grado"<<endl;
+	}
+	}
+		else 
+		{
+			cout << "No fue posible conectarse a la base de datos: " << mysql_error(connection) << endl;
+		}
+	}
+	else 
+	{
+		cout << "No es posible iniciar la biblioteca de MySQL" << endl;
+	}
+system("Pause()");	
+}
+///////////////////MODIFICAR ALUMNO/////////////////////////////
+void ModificardatoAlumno(){
+	MYSQL* connection;
+	string alumno_id;
+	string alumno_nombre;
+	string alumno_correo;
+	string alumno_clave;
+	string alumno_promedio;
+	string sql;
+	string sql3;
+	string modify;
+	int result;
+	MYSQL_RES* data;
+	MYSQL_ROW row;
+	const char* query;
+	connection = mysql_init(0);
+	if (connection)
+	{
+		cout<< "La libreria MySQL se ha iniciado correctamente"<<endl;
+		connection = mysql_real_connect(connection,serverdb, userdb, passworddb,databasedb, 3306, NULL,0);
+		if(connection)
+	{	
+			sql3 = "SELECT * FROM alumno ";
+			query = sql3.c_str();
+			result = mysql_query(connection, query);
+			if (result == 0) 
+			{
+				cout << "Se han obtenido los datos de alumnos" << endl;
+				cout<<endl;	
+				cout<<"Registros de Alumnos Ingresados para Modificar:"<<endl;
+				cout<<endl;
+				cout<<"Id"<<"\t"<<"Nombres "<<"\t"<<"Clave"<<"\t"<<"Correo"<<"\t\t"<<"Promedio nota"<<endl;
+				data = mysql_store_result(connection);
+				int countColumns = mysql_num_fields(data);
+				while(row = mysql_fetch_row(data))
+				{
+					for (int i = 0; i < countColumns; i++)
+					{
+						cout << row[i] << "\t";
+     				    
+					}
+					cout << endl;
+				}
+			}
+			cout<<endl;	
+		cout<<"Conexion exitosa a la base de datos "<<endl;
+	    fflush(stdin);
+	    cout<<endl;
+		cout << "Ingrese el nombre del alumno a modificar: ";
+		cin>>alumno_nombre; 
+		cout << "Ingrese el id del alumno a modificar: ";
+		cin>>alumno_id;
+		//pendiente de obtener
+			MYSQL_ROW row;
+			MYSQL_RES* data;
+			sql = "SELECT * FROM alumno where alumno_nombre='" + alumno_nombre + "'";
+			query = sql.c_str();
+			result = mysql_query(connection, query);
+			if (result == 0)
+			{
+				cout << "Se han obtenido los datos del alumno" << endl;	
+				cout<<endl;
+				data = mysql_store_result(connection);
+				int countColumns = mysql_num_fields(data);
+				while(row = mysql_fetch_row(data))
+				{
+					for (int i = 4; i < countColumns; i++)
+					{
+						cout << "Id: " << row[0] << endl;
+     					cout << "Nombre: " << row[1] << endl;      
+      					cout << "Clave: " << row[2] << endl;      
+      					cout << "Correo: " << row[3] << endl;
+      					cout << "Promedio: " << row[4] << endl; 
+					}
+					cout << endl;
+				}
+			}
+			fflush(stdin);
+	    	cout<<endl;
+			cout << "Ingrese el nuevo nombre del alumno: ";
+			getline(cin, alumno_nombre); 
+			cout << "Ingrese la nueva clave del alumno: ";
+			getline(cin, alumno_clave);
+			cout << "Ingrese el nuevo correo del alumno: ";
+			getline(cin, alumno_correo);
+			cout << "Ingrese el nuevo promedio del alumno: "; 
+			getline(cin, alumno_promedio);
+			//pendiente de obtener
+			modify = "UPDATE alumno SET alumno_nombre='" + alumno_nombre + "',alumno_clave='" + alumno_clave + "',alumno_correo='" + alumno_correo + "',alumno_promedio='" + alumno_promedio + "' WHERE alumno_id='" + alumno_id + "'";
+			query = modify.c_str();
+			result = mysql_query(connection, query);
+			if(result == 0)
+		{
+			fflush(stdin);
+	    	cout<<endl;
+			cout<<"Datos de alumno actualizado"<<endl;
+			cout<<"Nuevo nombre del alumno:"<< alumno_nombre<<endl;
+			cout<<"Nueva clave del alumno:"<< alumno_clave<<endl;
+			cout<<"Nuevo correo del alumno:"<< alumno_correo<<endl;
+			cout<<"Nuevo promedio del alumno:"<< alumno_promedio<<endl;
+			cout<<endl;
+		}	
+			else
+			{
+      		cout << "No se han obtenido los datos del alumno, aun no existe" << endl;
+      		}
+		}
+		else
+		{
+			cout << "No fue posible conectarse a la base de datos: " << mysql_error(connection) << endl;
+		}
+	}
+	else 
+	{
+		cout << "No es posible iniciar la biblioteca de MySQL" << endl;
+	}
+}
